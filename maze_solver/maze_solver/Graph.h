@@ -45,13 +45,20 @@ template <typename T>
 class Graph {
 private:
 	std::unordered_set<Edge<T>> edges;
-	std::unordered_map<Vertex<T>, std::set<Edge<T>>*> adjList;
+	std::unordered_map<Vertex<T>, std::unordered_set<Edge<T>>*> adjList;
 	bool undirected;
 public:
 	explicit Graph(bool undirected_ = false);
 	explicit Graph(const std::unordered_set<Vertex<T>>& vertices_, const std::unordered_set<Edge<T>>& edges_, bool undirected_ = false);
+	~Graph();
+	Graph(const Graph& other);
+	Graph& operator=(const Graph& other);
 	std::unordered_set<Edge<T>>* getEdges();
-	std::unordered_map<Vertex<T>, std::set<Edge<T>>*>* getAdjList();
+	std::unordered_map<Vertex<T>, std::unordered_set<Edge<T>>*>* getAdjList();
+	const std::unordered_set<Edge<T>>* getEdges() const;
+	const std::unordered_map<Vertex<T>, std::unordered_set<Edge<T>>*>* getAdjList() const;
+	void addEdge(const Edge<T>& edge);
+	void addVertex(const Vertex<T>& vertex);
 };
 
 
@@ -126,7 +133,7 @@ Graph<T>::Graph(const std::unordered_set<Vertex<T>>& vertices_, const std::unord
 		}
 	}
 	for (std::unordered_set<Vertex<T>>::iterator it = vertices_.begin(); it != vertices_.end(); ++it) {
-		adjList.emplace(*it, new std::set<Edge<T>>);
+		adjList.emplace(*it, new std::unordered_set<Edge<T>>);
 	}
 	for (auto it = edges.begin(); it != edges.end(); ++it) {
 		if (adjList.count(*(it->getU()))) {
@@ -136,11 +143,71 @@ Graph<T>::Graph(const std::unordered_set<Vertex<T>>& vertices_, const std::unord
 }
 
 template <typename T>
+Graph<T>::~Graph() {
+	for (auto it = adjList.begin(); it != adjList.end(); ++it) {
+		delete it->second;
+	}
+}
+
+template <typename T>
+Graph<T>::Graph(const Graph& other) : edges(other.edges) {
+	for (auto it = other.getAdjList()->begin(); it != other.getAdjList()->end(); ++it) {
+		this->adjList.emplace(it->first, new std::unordered_set<Edge<T>>(*(it->second)));
+	}
+}
+
+template <typename T>
+Graph<T>& Graph<T>::operator=(const Graph& other) {
+
+	edges = *(other.getEdges());
+	for (auto it = other.getAdjList()->begin(); it != other.getAdjList()->end(); ++it) {
+		this->adjList.emplace(it->first, new std::unordered_set<Edge<T>>(*(it->second)));
+	}
+	return *this;
+}
+
+template <typename T>
 std::unordered_set<Edge<T>>* Graph<T>::getEdges() {
 	return &(edges);
 }
 
 template <typename T>
-std::unordered_map<Vertex<T>, std::set<Edge<T>>*>* Graph<T>::getAdjList() {
+std::unordered_map<Vertex<T>, std::unordered_set<Edge<T>>*>* Graph<T>::getAdjList() {
 	return &(adjList);
+}
+
+template <typename T>
+const std::unordered_set<Edge<T>>* Graph<T>::getEdges() const {
+	return &(edges);
+}
+
+template <typename T>
+const std::unordered_map<Vertex<T>, std::unordered_set<Edge<T>>*>* Graph<T>::getAdjList() const {
+	return &(adjList);
+}
+
+template <typename T>
+void Graph<T>::addEdge(const Edge<T>& edge) {
+	edges.insert(edge);
+	if (undirected) {
+		edges.insert( Edge<T>(edge.getV(), edge.getU(), edge.getWeight()) );
+	}
+
+	if (!adjList.count(*(edge.getU()))) {
+		adjList.emplace(*(edge.getU()), new std::unordered_set<Edge<T>>);
+	}
+	if (!adjList.count(*(edge.getV()))) {
+		adjList.emplace(*(edge.getV()), new std::unordered_set<Edge<T>>);
+	}
+	adjList.at(*(edge.getU()))->insert(edge);
+	if (undirected) {
+		adjList.at( *(edge.getV()) )->insert( Edge<T>(edge.getV(), edge.getU(), edge.getWeight()) );
+	}
+}
+
+template <typename T>
+void Graph<T>::addVertex(const Vertex<T>& vertex) {
+	if (!adjList.count(vertex)) {
+		adjList.emplace(vertex, new std::unordered_set<Edge<T>>);
+	}
 }
