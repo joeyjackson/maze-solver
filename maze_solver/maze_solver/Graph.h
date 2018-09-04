@@ -25,12 +25,15 @@ template <typename T>
 class Edge {
 private:
 	Vertex<T> *u, *v;
-	unsigned int weight;
+	float weight;
 public:
-	Edge(Vertex<T>* u_, Vertex<T>* v_, unsigned int weight_);
+	Edge(Vertex<T>* u_, Vertex<T>* v_, float weight_);
 	Vertex<T>* getU() const;
+	void setU(Vertex<T>* new_u);
 	Vertex<T>* getV() const;
-	unsigned int getWeight() const;
+	void setV(Vertex<T>* new_v);
+	float getWeight() const;
+	void setWeight(float new_weight);
 	bool operator<(const Edge<T>& other) const;
 	bool operator>(const Edge<T>& other) const;
 	bool operator==(const Edge<T>& other) const;
@@ -71,13 +74,13 @@ template <typename T>
 T* Vertex<T>::getData() const { return data; }
 
 template <typename T>
-bool Vertex<T>::operator==(const Vertex<T>& other) const { return *(this->data) == (*other.getData()); }
+bool Vertex<T>::operator==(const Vertex<T>& other) const { return *(this->data) == *(other.data); }
 
 template <typename T>
-bool Vertex<T>::operator>(const Vertex<T>& other) const { return *(this->data) > (*other.getData()); }
+bool Vertex<T>::operator>(const Vertex<T>& other) const { return *(this->data) > *(other.data); }
 
 template <typename T>
-bool Vertex<T>::operator<(const Vertex<T>& other) const { return *(this->data) < (*other.getData()); }
+bool Vertex<T>::operator<(const Vertex<T>& other) const { return *(this->data) < *(other.data); }
 
 template<typename T>
 size_t std::hash<Vertex<T>>::operator()(const Vertex<T>& obj) const {
@@ -86,16 +89,25 @@ size_t std::hash<Vertex<T>>::operator()(const Vertex<T>& obj) const {
 
 //***************** EDGE ******************************************************
 template <typename T>
-Edge<T>::Edge(Vertex<T>* u_, Vertex<T>* v_, unsigned int weight_) : u(u_), v(v_), weight(weight_) {};
+Edge<T>::Edge(Vertex<T>* u_, Vertex<T>* v_, float weight_) : u(u_), v(v_), weight(weight_) { };
 
 template <typename T>
 Vertex<T>* Edge<T>::getU() const { return u; }
 
 template <typename T>
+void Edge<T>::setU(Vertex<T>* new_u) { u = new_u; }
+
+template <typename T>
 Vertex<T>* Edge<T>::getV() const { return v; }
 
 template <typename T>
-unsigned int Edge<T>::getWeight() const { return weight; }
+void Edge<T>::setV(Vertex<T>* new_v) { v = new_v; }
+
+template <typename T>
+float Edge<T>::getWeight() const { return weight; }
+
+template <typename T>
+void Edge<T>::setWeight(float new_weight) { weight = new_weight; }
 
 template <typename T>
 bool Edge<T>::operator<(const Edge<T>& other) const { 
@@ -123,7 +135,8 @@ size_t std::hash<Edge<T>>::operator()(const Edge<T>& obj) const {
 
 //***************** GRAPH *****************************************************
 template <typename T>
-Graph<T>::Graph(bool undirected_) : undirected(undirected_) {}
+Graph<T>::Graph(bool undirected_) : undirected(undirected_) {
+}
 
 template <typename T>
 Graph<T>::Graph(const std::unordered_set<Vertex<T>>& vertices_, const std::unordered_set<Edge<T>>& edges_, bool undirected_) : edges(edges_), undirected(undirected_) {
@@ -211,3 +224,4 @@ void Graph<T>::addVertex(const Vertex<T>& vertex) {
 		adjList.emplace(vertex, new std::unordered_set<Edge<T>>);
 	}
 }
+
