@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="Main.h" />
     <ClInclude Include="MazeSolver.h" />
     <ClInclude Include="SearchAlgorithms.h" />
   </ItemGroup>

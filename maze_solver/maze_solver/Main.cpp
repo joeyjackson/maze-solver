@@ -1,112 +1,100 @@
-#include "Graph.h"
-#include "SearchAlgorithms.h"
-#include "MazeSolver.h"
-#include <unordered_set>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <memory>
-#include <opencv2/opencv.hpp>
-
-template <typename T>
-void PrintGraph(const Graph<T>& graph) {
-	const std::unordered_set<Edge<T>>* edges = graph.getEdges();
-	const std::unordered_map<Vertex<T>, std::unordered_set<Edge<T>>*>* adjList = graph.getAdjList();
-	std::cout << "Edge Set" << std::endl;
-	for (auto it = edges->begin(); it != edges->end(); ++it) {
-		std::cout << (*(it->getU()->getData())) << " " << (*(it->getV()->getData())) << " " << it->getWeight() << std::endl;
-	}
-
-	std::cout << "Adjacency List" << std::endl;
-	for (auto it = adjList->begin(); it != adjList->end(); ++it) {
-		std::cout << (*(it->first.getData())) << "(" << it->second->size() << ")" << " : ";
-		for (auto e_it = it->second->begin(); e_it != it->second->end(); ++e_it) {
-			std::cout << (*(e_it->getV()->getData())) << " ";
-		}
-		std::cout << std::endl;
-	}
-}
+#include "Main.h"
 
 int main(int argc, char** argv) {
-	/*
-	Vertex<Point> A(std::make_shared<Point>(1,1));
-	Vertex<Point> B(std::make_shared<Point>(1,2));
-	Vertex<Point> C(std::make_shared<Point>(1,3));
-	Vertex<Point> D(std::make_shared<Point>(1,4));
-	Vertex<Point> E(std::make_shared<Point>(1,5));
-	Vertex<Point> F(std::make_shared<Point>(1,6));
-	Vertex<Point> G(std::make_shared<Point>(1,7));
-	Vertex<Point> H(std::make_shared<Point>(1,8));
-	Vertex<Point> I(std::make_shared<Point>(1,9));
+	std::string file_path;
+	char filename[MAX_PATH];
 
-	std::unordered_set<Vertex<Point>> verts;
-	verts.insert(A);
-	verts.insert(B);
-	verts.insert(C);
-	verts.insert(D);
-	verts.insert(E);
-	verts.insert(F);
-	verts.insert(G);
-	verts.insert(H);
-	verts.insert(I);
+	OPENFILENAME ofn;
+	ZeroMemory(&filename, sizeof(filename));
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = "PNG Files\0*.png";
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = "Select a maze image file";
+	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
 
-	std::unordered_set<Edge<Point>> edg;
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(A), std::make_shared<Vertex<Point>>(B), 4));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(A), std::make_shared<Vertex<Point>>(C), 9));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(A), std::make_shared<Vertex<Point>>(D), 8));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(B), std::make_shared<Vertex<Point>>(D), 5));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(B), std::make_shared<Vertex<Point>>(E), 7));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(C), std::make_shared<Vertex<Point>>(D), 2));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(C), std::make_shared<Vertex<Point>>(F), 1));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(D), std::make_shared<Vertex<Point>>(G), 10));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(E), std::make_shared<Vertex<Point>>(G), 6));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(F), std::make_shared<Vertex<Point>>(G), 3));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(F), std::make_shared<Vertex<Point>>(I), 19));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(G), std::make_shared<Vertex<Point>>(I), 8));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(G), std::make_shared<Vertex<Point>>(H), 12));
-	edg.insert(Edge<Point>(std::make_shared<Vertex<Point>>(I), std::make_shared<Vertex<Point>>(H), 13));*/
-
-	//Graph<Point> graph(verts, edg, true);
-	//PrintGraph(graph);
-
-	/*auto solution = solver.solve(A, H);
-	float length = std::get<0>(solution);
-	std::cout << length << std::endl;
-	if (length >= 0) {
-
-		auto path = std::get<1>(solution);
-		for (auto it = path.begin(); it != path.end(); ++it) {
-			std::cout << (*it->getU()->getData()) << " ";
+	if (GetOpenFileNameA(&ofn)) {
+		file_path = std::string(filename);
+	} else {
+		switch (CommDlgExtendedError())
+		{
+		case CDERR_DIALOGFAILURE: std::cout << "CDERR_DIALOGFAILURE\n";   break;
+		case CDERR_FINDRESFAILURE: std::cout << "CDERR_FINDRESFAILURE\n";  break;
+		case CDERR_INITIALIZATION: std::cout << "CDERR_INITIALIZATION\n";  break;
+		case CDERR_LOADRESFAILURE: std::cout << "CDERR_LOADRESFAILURE\n";  break;
+		case CDERR_LOADSTRFAILURE: std::cout << "CDERR_LOADSTRFAILURE\n";  break;
+		case CDERR_LOCKRESFAILURE: std::cout << "CDERR_LOCKRESFAILURE\n";  break;
+		case CDERR_MEMALLOCFAILURE: std::cout << "CDERR_MEMALLOCFAILURE\n"; break;
+		case CDERR_MEMLOCKFAILURE: std::cout << "CDERR_MEMLOCKFAILURE\n";  break;
+		case CDERR_NOHINSTANCE: std::cout << "CDERR_NOHINSTANCE\n";     break;
+		case CDERR_NOHOOK: std::cout << "CDERR_NOHOOK\n";          break;
+		case CDERR_NOTEMPLATE: std::cout << "CDERR_NOTEMPLATE\n";      break;
+		case CDERR_STRUCTSIZE: std::cout << "CDERR_STRUCTSIZE\n";      break;
+		case FNERR_BUFFERTOOSMALL: std::cout << "FNERR_BUFFERTOOSMALL\n";  break;
+		case FNERR_INVALIDFILENAME: std::cout << "FNERR_INVALIDFILENAME\n"; break;
+		case FNERR_SUBCLASSFAILURE: std::cout << "FNERR_SUBCLASSFAILURE\n"; break;
+		default: std::cout << "You cancelled.\n";
 		}
-		std::cout << (*path.back().getV()->getData()) << std::endl;
-	}*/
-
-	cv::Mat image = cv::imread("C:\\Users\\ejjac\\Documents\\CppProjs\\OpenCV_Proj\\maze-solver\\maze1.png");
-
-	MazeSolver solver(image);
-
-	//PrintGraph(*(solver.getGraph()));
-
-	cv::Mat newImg = cv::Mat(image.rows, image.cols, CV_8UC3, cv::Scalar(0, 0, 0));
-	printf("%d", solver.getGraph()->getEdges()->size());
-	for (Edge<Point> edge : *(solver.getGraph()->getEdges())) {
-		std::cout << *(edge.getU()->getData()) << std::endl;
-
-		cv::Point p_u(edge.getU()->getData()->x, edge.getU()->getData()->y);
-		cv::Point p_v(edge.getV()->getData()->x, edge.getV()->getData()->y);
-		//cv::line(newImg, p_u, p_v, cv::Scalar(255, 255, 255), 1);
-		cv::Point3_<uchar>* p1 = newImg.ptr<cv::Point3_<uchar> >(p_u.y, p_u.x);
-		p1->x = 255;
-		cv::Point3_<uchar>* p2 = newImg.ptr<cv::Point3_<uchar> >(p_v.y, p_v.x);
-		p2->x = 255;
 	}
 
+	//std::string path = "C:\\Users\\ejjac\\Documents\\CppProjs\\OpenCV_Proj\\maze-solver\\";
+	//std::string fname = "maze4";
 
+	cv::Mat image = cv::imread(file_path);
 
-	cv::resize(newImg, newImg, cv::Size(200, 200));
+	MazeSolver solver(image);
+	//PrintGraph(*(solver.getGraph()));
+	std::tuple<float, std::vector<Edge<Point>>> solution = solver.solve();
+	std::vector<Edge<Point>> solution_edges = std::get<1>(solution);
 
-	cv::imshow("test", newImg);
+	cv::Mat solution_img = cv::Mat(image.rows, image.cols, CV_8UC3, cv::Scalar(0, 0, 0));
 
-	std::cin.get();
+	for (Edge<Point> edge : *(solver.getGraph()->getEdges())) {
+		cv::Point p_u(edge.getU()->getData()->x, edge.getU()->getData()->y);
+		cv::Point p_v(edge.getV()->getData()->x, edge.getV()->getData()->y);
+		cv::line(solution_img, p_u, p_v, cv::Scalar(255, 255, 255), 1);
+	}
+
+	for (Edge<Point> edge : solution_edges) {
+		cv::Point p_u(edge.getU()->getData()->x, edge.getU()->getData()->y);
+		cv::Point p_v(edge.getV()->getData()->x, edge.getV()->getData()->y);
+		cv::line(solution_img, p_u, p_v, cv::Scalar(255, 0, 0), 1);
+	}
+
+	if (solution_img.rows < 300) {
+		image_resize(solution_img, solution_img, 200, -1, cv::INTER_NEAREST);
+	} 
+	if (solution_img.cols < 300) {
+		image_resize(solution_img, solution_img, -1, 200, cv::INTER_NEAREST);
+	}
+
+	cv::imwrite(file_path.substr(0, file_path.size() - 4) + "_solution.png", solution_img);
+
+	const char * window_name = "MAZE SOLUTION";
+	cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
+	while (cvGetWindowHandle(window_name)) {
+		cv::imshow(window_name, solution_img);
+		cv::waitKey(1);
+	}
+	cv::destroyAllWindows();
 	return 0;
+}
+
+void image_resize(const cv::Mat& img, cv::Mat& dst, int height, int width, int inter) {
+	if (height < 0 && width < 0) {
+		height = img.rows;
+		width = img.cols;
+	}
+	else if (height < 0) {
+		double ratio = (double)width / (double)img.cols;
+		height = (int)(img.rows * ratio);
+	}
+	else if (width < 0) {
+		double ratio = (double)height / (double)img.rows;
+		width = (int)(img.cols * ratio);
+	}
+
+	cv::resize(img, dst, cv::Size(width, height), 0, 0, inter);
 }

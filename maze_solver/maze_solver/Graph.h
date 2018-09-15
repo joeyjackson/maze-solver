@@ -11,6 +11,7 @@ class Vertex {
 private:
 	std::shared_ptr<T> data;
 public:
+	Vertex();
 	Vertex(std::shared_ptr<T> data_);
 	std::shared_ptr<T> getData() const;
 	bool operator==(const Vertex<T>& other) const;
@@ -69,6 +70,10 @@ public:
 
 
 //***************** VERTEX ****************************************************
+
+template <typename T>
+Vertex<T>::Vertex() {}
+
 template <typename T>
 Vertex<T>::Vertex(std::shared_ptr<T> data_) : data(data_) {}
 
