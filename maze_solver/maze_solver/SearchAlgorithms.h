@@ -1,10 +1,14 @@
 #pragma once
+
 #include <vector>
 #include <queue>
 #include <cmath>
 #include <tuple>
 #include <sstream>
 #include <string>
+#include <functional>
+#include <memory>
+#include "Graph.h"
 
 struct Point {
 	float x, y;
@@ -30,7 +34,8 @@ struct Point {
 	bool operator>(const Point& other) {
 		if (this->x == other.x) {
 			return this->y > other.y;
-		} else {
+		}
+		else {
 			return this->x > other.x;
 		}
 	}
@@ -53,16 +58,27 @@ struct Point {
 	}
 };
 
-std::ostream& operator<<(std::ostream &strm, const Point& pt) {
-	std::stringstream s;
-	s << "(" << pt.x << ", " << pt.y << ")";
-	return strm << s.str();
-}
+std::ostream& operator<<(std::ostream &strm, const Point& pt);
 
 template <>
 struct std::hash<Point> {
 	size_t operator()(const Point& obj) const {
-		return (34 * obj.x * obj.x) + (obj.y * obj.y);
+		return (53 * obj.x) + (obj.y);
+	}
+};
+
+template <>
+struct std::hash<std::tuple<int, int>> {
+	size_t operator()(const std::tuple<int, int>& obj) const {
+		return (53 * std::get<0>(obj)) + (std::get<1>(obj));
+	}
+};
+
+template <>
+struct std::hash<std::shared_ptr<Point>> {
+	size_t operator()(const std::shared_ptr<Point>& obj) const {
+		std::hash<Point> h;
+		return h(*obj);
 	}
 };
 
@@ -73,7 +89,7 @@ public:
 };
 
 template <typename T>
-class UniformCostSearch : SearchAlgorithm<T> {
+class UniformCostSearch : public SearchAlgorithm<T> {
 public:
 	virtual std::tuple<float, std::vector<Edge<T>>> solve(const Graph<T>& graph, const Vertex<T>& start, const Vertex<T>& end);
 };
@@ -127,7 +143,7 @@ std::tuple<float, std::vector<Edge<T>>> UniformCostSearch<T>::solve(const Graph<
 }
 
 template <typename T>
-class AStarSearch : SearchAlgorithm<T> {
+class AStarSearch : public SearchAlgorithm<T> {
 	float (*_heuristic)(const T& curr, const T& end);
 public:
 	AStarSearch(float (*heuristic)(const T& curr, const T& end)) : _heuristic(heuristic) {};
@@ -148,9 +164,9 @@ std::tuple<float, std::vector<Edge<T>>> AStarSearch<T>::solve(const Graph<T>& gr
 	}
 
 	std::unordered_set<Vertex<T>> visited;
-	std::priority_queue<std::tuple<float, float, std::vector<Edge<T>>>,
+	std::priority_queue< std::tuple<float, float, std::vector<Edge<T>>>,
 		std::vector<std::tuple<float, float, std::vector<Edge<T>>>>,
-		std::greater<std::tuple<float, float, std::vector<Edge<T>>>>> pq;
+		std::greater<std::tuple<float, float, std::vector<Edge<T>>>> > pq;
 
 	visited.insert(start);
 	for (auto& edge : *adjList.at(start)) {

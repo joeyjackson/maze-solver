@@ -1,16 +1,18 @@
 #pragma once
+
 #include <unordered_set>
 #include <unordered_map>
 #include <set>
 #include <iostream>
+#include <memory>
 
 template <typename T>
 class Vertex {
 private:
-	T* data;
+	std::shared_ptr<T> data;
 public:
-	Vertex(T* data_);
-	T* getData() const;
+	Vertex(std::shared_ptr<T> data_);
+	std::shared_ptr<T> getData() const;
 	bool operator==(const Vertex<T>& other) const;
 	bool operator>(const Vertex<T>& other) const;
 	bool operator<(const Vertex<T>& other) const;
@@ -24,14 +26,14 @@ struct std::hash<Vertex<T>> {
 template <typename T>
 class Edge {
 private:
-	Vertex<T> *u, *v;
+	std::shared_ptr<Vertex<T>> u, v;
 	float weight;
 public:
-	Edge(Vertex<T>* u_, Vertex<T>* v_, float weight_);
-	Vertex<T>* getU() const;
-	void setU(Vertex<T>* new_u);
-	Vertex<T>* getV() const;
-	void setV(Vertex<T>* new_v);
+	Edge(std::shared_ptr<Vertex<T>> u_, std::shared_ptr<Vertex<T>> v_, float weight_);
+	std::shared_ptr<Vertex<T>> getU() const;
+	void setU(std::shared_ptr<Vertex<T>> new_u);
+	std::shared_ptr<Vertex<T>> getV() const;
+	void setV(std::shared_ptr<Vertex<T>> new_v);
 	float getWeight() const;
 	void setWeight(float new_weight);
 	bool operator<(const Edge<T>& other) const;
@@ -68,10 +70,10 @@ public:
 
 //***************** VERTEX ****************************************************
 template <typename T>
-Vertex<T>::Vertex(T* data_) : data(data_) {}
+Vertex<T>::Vertex(std::shared_ptr<T> data_) : data(data_) {}
 
 template <typename T>
-T* Vertex<T>::getData() const { return data; }
+std::shared_ptr<T> Vertex<T>::getData() const { return data; }
 
 template <typename T>
 bool Vertex<T>::operator==(const Vertex<T>& other) const { return *(this->data) == *(other.data); }
@@ -89,19 +91,19 @@ size_t std::hash<Vertex<T>>::operator()(const Vertex<T>& obj) const {
 
 //***************** EDGE ******************************************************
 template <typename T>
-Edge<T>::Edge(Vertex<T>* u_, Vertex<T>* v_, float weight_) : u(u_), v(v_), weight(weight_) { };
+Edge<T>::Edge(std::shared_ptr<Vertex<T>> u_, std::shared_ptr<Vertex<T>> v_, float weight_) : u(u_), v(v_), weight(weight_) { };
 
 template <typename T>
-Vertex<T>* Edge<T>::getU() const { return u; }
+std::shared_ptr<Vertex<T>> Edge<T>::getU() const { return u; }
 
 template <typename T>
-void Edge<T>::setU(Vertex<T>* new_u) { u = new_u; }
+void Edge<T>::setU(std::shared_ptr<Vertex<T>> new_u) { u = new_u; }
 
 template <typename T>
-Vertex<T>* Edge<T>::getV() const { return v; }
+std::shared_ptr<Vertex<T>> Edge<T>::getV() const { return v; }
 
 template <typename T>
-void Edge<T>::setV(Vertex<T>* new_v) { v = new_v; }
+void Edge<T>::setV(std::shared_ptr<Vertex<T>> new_v) { v = new_v; }
 
 template <typename T>
 float Edge<T>::getWeight() const { return weight; }
