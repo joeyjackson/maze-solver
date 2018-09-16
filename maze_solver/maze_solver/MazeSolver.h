@@ -4,7 +4,7 @@
 #include "Graph.h"
 #include <string>
 #include <memory>
-#include <opencv2\opencv.hpp>
+#include <opencv2/opencv.hpp>
 
 class MazeSolver {
 private:

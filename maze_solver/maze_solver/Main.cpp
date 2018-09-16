@@ -46,7 +46,9 @@ int main(int argc, char** argv) {
 
 	MazeSolver solver(image);
 	//PrintGraph(*(solver.getGraph()));
+	fprintf(stderr, "Graph Created\n");
 	std::tuple<float, std::vector<Edge<Point>>> solution = solver.solve();
+	fprintf(stderr, "Maze Solved\n");
 	std::vector<Edge<Point>> solution_edges = std::get<1>(solution);
 
 	cv::Mat solution_img = cv::Mat(image.rows, image.cols, CV_8UC3, cv::Scalar(0, 0, 0));
